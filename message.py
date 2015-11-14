@@ -1,5 +1,6 @@
 # coding: utf-8
 
+
 class Message:
     def __init__(self, prefix, command, *args):
         self.prefix = prefix
