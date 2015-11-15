@@ -1,5 +1,7 @@
 # coding: utf-8
-
+"""
+Цифровые ответы клиенту
+"""
 from config import SERVER
 from message import Message
 
