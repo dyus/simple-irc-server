@@ -26,12 +26,6 @@ class JoinCommand(BaseCommand):
         if not self.channel_names:
             return err_needmoreparams(self.command)
 
-    @staticmethod
-    def update_channel_users_messages(channel, client):
-        nicks = ' '.join(channel_client.nick for channel_client in channel.clients)
-        client.send(Message(SERVER, '353', client.nick, '=', str(channel), nicks))
-        client.send(Message(SERVER, '366', client.nick, 'End of /NAMES list'))
-
     def update_connected_clients(self, channel):
         for client in channel.clients:
             self.update_channel_users_messages(channel, client)

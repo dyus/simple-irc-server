@@ -1,5 +1,4 @@
 # coding: utf-8
-from message import Message
 
 
 class Channel:

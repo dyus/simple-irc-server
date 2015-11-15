@@ -2,15 +2,14 @@
 
 import asyncio
 
-from client import Client
 from commands.join import JoinCommand
 from commands.nick import NickCommand
 from commands.privmsg import PrivmsgCommand
+from commands.quit import QuitCommand
 from commands.user import UserCommand
 from message import Message
-from config import *
-from channel import Channel
-from numeric_replies import *
+from config import SERVER, PORT, COMMANDS
+from numeric_replies import err_unknowncommand
 
 
 class IrcServer:
@@ -50,11 +49,8 @@ class IrcServer:
     def privmsg(self, command, writer):
         PrivmsgCommand(self.clients, self.channels, command, writer).run_command()
 
-    def quit(self, data, writer):
-        client = self.clients[writer]
-        for ch in client.channels:
-            client.send(Message(SERVER, 'PART', ch.name, "I'm out"))
-        del self.clients[writer]
+    def quit(self, command, writer):
+        QuitCommand(self.clients, command, writer)
 
 
 server = IrcServer()
