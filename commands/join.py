@@ -56,6 +56,7 @@ class JoinCommand(BaseCommand):
                     channel = self.channels[channel_name]
                     if client not in channel.clients:
                         self.channels[channel_name].clients.append(client)
+                        client.channels.append(channel)
                         prefix = '{}!{}'.format(client.nick, SERVER)
                         client.send(Message(prefix, 'JOIN', str(channel)))
                         self.update_channel_users_messages(channel, client)

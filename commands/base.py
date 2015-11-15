@@ -7,7 +7,12 @@ class BaseCommand:
 
     @staticmethod
     def concat_after_colon(args):
-        # объединим аргументы после :
+        """
+        Метод объединяет аргументы после :
+        Пример ['PRIVMSG', '#room', ':first', 'msg'] -> ['PRIVMSG', '#room', ':first msg']
+        :param args:
+        :return:
+        """
         indexes = [n for n, arg in enumerate(args) if arg.startswith(':')]
         if indexes:
             args[indexes[0]:] = ' '.join(args[indexes[0]:])

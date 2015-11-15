@@ -30,3 +30,11 @@ def err_nosuchnick(nick):
 
 def err_notregistered():
     return Message(SERVER, '451', 'You have not registered')
+
+
+def err_notonchannel(channel_name):
+    return Message(SERVER, '442', channel_name, "You're not on that channel")
+
+
+def err_nosuchchannel(channel_name):
+    return Message(SERVER, '401', channel_name, 'No such channel')
