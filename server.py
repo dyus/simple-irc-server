@@ -3,6 +3,7 @@
 import asyncio
 
 from client import Client
+from commands.join import JoinCommand
 from commands.nick import NickCommand
 from commands.user import UserCommand
 from message import Message
@@ -24,59 +25,26 @@ class IrcServer:
             for command in data.decode('utf-8').rstrip().split('\r\n'):
                 self.run_command(command, writer)
 
-    def run_command(self, data, writer):
-        command = data.split(' ')[0].lower()
-        if command in COMMANDS:
-            return self._get_command(command)(data, writer)
+    def run_command(self, command, writer):
+        command_name = command.split(' ')[0].lower()
+        if command_name in COMMANDS:
+            return self._get_command(command_name)(command, writer)
 
         else:
             writer.write(err_unknowncommand())
 
-    def _get_command(self, command):
-        command = getattr(self, command)
+    def _get_command(self, command_name):
+        command = getattr(self, command_name)
         return command
 
-    def nick(self, data, writer):
-        NickCommand(self.clients, writer, data).run_command()
+    def nick(self, command, writer):
+        NickCommand(self.clients, command, writer).run_command()
 
-    def user(self, data, writer):
-        UserCommand(self.clients, writer, data).run_command()
+    def user(self, command, writer):
+        UserCommand(self.clients, command, writer).run_command()
 
-    def quit(self, data, writer):
-        client = self.clients[writer]
-        for ch in client.channels:
-            client.send(Message(SERVER, 'PART', ch.name, "I'm out"))
-        del self.clients[writer]
-
-    def join(self, data, writer):
-        # TODO пройтись еще раз убедиться что все сообщения соответсвуют формату ирк протокола
-        # TODO при добавлении нового нужно отсылать сообщение с пересчетом списка всем участникам канала
-        client = self.clients[writer]
-
-        args = data.split(' ')
-        if len(args) > 1:
-            channel_names = args[1:]
-            for channel_name in channel_names:
-                if channel_name in self.channels:
-                    channel = self.channels[channel_name]
-                    if client not in channel.clients:
-                        self.channels[channel_name].clients.append(client)
-                        prefix = '{}!{}'.format(client.nick, SERVER)
-                        client.send(Message(prefix, 'JOIN', str(channel)))
-                        nicks = ' '.join(channel_client.nick for channel_client in channel.clients)
-                        client.send(Message(SERVER, '353', client.nick, '=', str(channel), nicks))
-                        client.send(Message(SERVER, '366', client.nick, 'End of /NAMES list'))
-                else:
-                    channel = Channel(channel_name, client)
-                    self.channels[channel_name] = channel
-                    client.channels.append(channel)
-                    prefix = '{}!{}'.format(client.nick, SERVER)
-                    client.send(Message(prefix, 'JOIN', str(channel)))
-                    nicks = ' '.join(channel_client.nick for channel_client in channel.clients)
-                    client.send(Message(SERVER, '353', client.nick, '=', str(channel), nicks))
-                    client.send(Message(SERVER, '366', client.nick, 'End of /NAMES list'))
-        else:
-            client.send(Message(SERVER, '461', 'JOIN', 'Not enough parameters'))
+    def join(self, command, writer):
+        JoinCommand(self.clients, self.channels, command, writer)
 
     def privmsg(self, data, writer):
         # :Guest53954!~test3@122.96.145.130 PRIVMSG #ubuntu :exit
@@ -92,6 +60,12 @@ class IrcServer:
         for ch_client in channel.clients:
             if ch_client != client:
                 ch_client.send(Message(prefix, 'PRIVMSG', str(channel), msg_body))
+                
+    def quit(self, data, writer):
+        client = self.clients[writer]
+        for ch in client.channels:
+            client.send(Message(SERVER, 'PART', ch.name, "I'm out"))
+        del self.clients[writer]
 
 
 server = IrcServer()

@@ -26,3 +26,7 @@ def err_nicknameinuse(nick):
 
 def err_nosuchnick(nick):
     return Message(SERVER, '401', nick, 'No such nick')
+
+
+def err_notregistered():
+    return Message(SERVER, '451', 'You have not registered')

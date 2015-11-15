@@ -20,7 +20,7 @@ class UserCommand(BaseCommand):
         args = self.command.split(' ')
 
         self.concat_after_colon(args)
-        if args:
+        if len(args) == 2:
             self.nick = args[1]
             return self.nick, len(args)
 
