@@ -1,0 +1,28 @@
+# coding: utf-8
+
+from config import SERVER
+from message import Message
+
+
+def err_unknowncommand():
+    return Message(SERVER, '421', 'Unknown command')
+
+
+def err_needmoreparams(command):
+    return Message(SERVER, '461', command, 'Not enough parameters')
+
+
+def err_nonicknamegiven():
+    return Message(SERVER, '431', 'No nickname given')
+
+
+def err_erroneusnickname(nick):
+    return Message(SERVER, '432', nick, 'Erroneous nickname')
+
+
+def err_nicknameinuse(nick):
+    return Message(SERVER, '433', nick, 'Nickname is already in use')
+
+
+def err_nosuchnick(nick):
+    return Message(SERVER, '401', nick, 'No such nick')
