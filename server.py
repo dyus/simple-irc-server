@@ -7,7 +7,6 @@ from commands.nick import NickCommand
 from commands.privmsg import PrivmsgCommand
 from commands.quit import QuitCommand
 from commands.user import UserCommand
-from message import Message
 from config import SERVER, PORT, COMMANDS
 from numeric_replies import err_unknowncommand
 
@@ -22,6 +21,8 @@ class IrcServer:
     async def handle_connection(self, reader, writer):
         while True:
             data = await reader.read(8192)
+            if not data:
+                break
             for command in data.decode('utf-8').rstrip().split('\r\n'):
                 self.run_command(command, writer)
 
@@ -31,7 +32,7 @@ class IrcServer:
             return self._get_command(command_name)(command, writer)
 
         else:
-            writer.write(err_unknowncommand())
+            writer.write(bytes(err_unknowncommand()))
 
     def _get_command(self, command_name):
         command = getattr(self, command_name)
@@ -50,7 +51,7 @@ class IrcServer:
         PrivmsgCommand(self.clients, self.channels, command, writer).run_command()
 
     def quit(self, command, writer):
-        QuitCommand(self.clients, command, writer)
+        QuitCommand(self.clients, command, writer).run_command()
 
 
 server = IrcServer()

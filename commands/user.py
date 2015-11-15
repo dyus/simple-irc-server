@@ -20,21 +20,21 @@ class UserCommand(BaseCommand):
         args = self.command.split(' ')
 
         self.concat_after_colon(args)
-        if len(args) == 2:
+        if len(args) == 5:
             self.nick = args[1]
-            return self.nick, len(args)
 
-    def validate_nick(self):
-        if self.nick not in self.clients:
+    def validate(self):
+        if self.nick is None:
+            return err_needmoreparams(self.command)
+
+        nicks = [c.nick for c in self.clients.values()]
+        if self.nick not in nicks:
             return err_nosuchnick(self.nick)
 
     def run_command(self):
-        self.nick, args_len = self.parse_command()
-        if args_len != 5:
-            self.writer.write(bytes(err_needmoreparams(self.command)))
-            return
+        self.parse_command()
 
-        validation_error = self.validate_nick()
+        validation_error = self.validate()
         if validation_error:
             self.writer.write(bytes(validation_error))
             return

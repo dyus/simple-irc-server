@@ -19,7 +19,7 @@ class BaseCommand:
         """
         indexes = [n for n, arg in enumerate(args) if arg.startswith(':')]
         if indexes:
-            args[indexes[0]:] = ' '.join(args[indexes[0]:])
+            args[indexes[0]:] = [' '.join(args[indexes[0]:]), ]
 
     @staticmethod
     def update_channel_users_messages(channel, client):

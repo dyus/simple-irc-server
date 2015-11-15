@@ -29,10 +29,9 @@ class QuitCommand(BaseCommand):
 
         client = self.clients[self.writer]
         for ch in client.channels:
-            client.send(Message(SERVER, 'PART', ch.name, self.message))
-
             ch.clients.remove(client)
             for ch_client in ch.clients:
+                ch_client.send(Message(ch_client.nick, 'PART', ch.name, self.message))
                 self.update_channel_users_messages(ch, ch_client)
 
         del self.clients[self.writer]

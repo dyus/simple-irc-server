@@ -9,7 +9,7 @@ from numeric_replies import err_nonicknamegiven, err_erroneusnickname, err_nickn
 
 
 class NickCommand(BaseCommand):
-    def __init__(self, clients, writer, command):
+    def __init__(self, clients, command, writer):
         self.clients = clients
         self.writer = writer
         self.command = command
@@ -25,7 +25,8 @@ class NickCommand(BaseCommand):
             return err_nonicknamegiven()
         if len(self.nick) > 9:
             return err_erroneusnickname(self.nick)
-        if self.nick in self.clients:
+        nicks = [c.nick for c in self.clients.values()]
+        if self.nick in nicks:
             return err_nicknameinuse(self.nick)
 
     def run_command(self):
